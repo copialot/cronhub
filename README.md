@@ -27,20 +27,16 @@ Download the latest release and install as a system service:
 
 ```bash
 # Linux (amd64)
-curl -fsSL https://github.com/copialot/cronhub/releases/latest/download/cronhub-linux-amd64.tar.gz | tar xz
-sudo bash install.sh install
+tmpdir=$(mktemp -d) && curl -fsSL https://github.com/copialot/cronhub/releases/latest/download/cronhub-linux-amd64.tar.gz | tar xz -C "$tmpdir" && cd "$tmpdir" && sudo bash install.sh install; cd - && rm -rf "$tmpdir"
 
 # Linux (arm64)
-curl -fsSL https://github.com/copialot/cronhub/releases/latest/download/cronhub-linux-arm64.tar.gz | tar xz
-sudo bash install.sh install
+tmpdir=$(mktemp -d) && curl -fsSL https://github.com/copialot/cronhub/releases/latest/download/cronhub-linux-arm64.tar.gz | tar xz -C "$tmpdir" && cd "$tmpdir" && sudo bash install.sh install; cd - && rm -rf "$tmpdir"
 
 # macOS (Apple Silicon)
-curl -fsSL https://github.com/copialot/cronhub/releases/latest/download/cronhub-darwin-arm64.tar.gz | tar xz
-bash install.sh install
+tmpdir=$(mktemp -d) && curl -fsSL https://github.com/copialot/cronhub/releases/latest/download/cronhub-darwin-arm64.tar.gz | tar xz -C "$tmpdir" && cd "$tmpdir" && bash install.sh install; cd - && rm -rf "$tmpdir"
 
 # macOS (Intel)
-curl -fsSL https://github.com/copialot/cronhub/releases/latest/download/cronhub-darwin-amd64.tar.gz | tar xz
-bash install.sh install
+tmpdir=$(mktemp -d) && curl -fsSL https://github.com/copialot/cronhub/releases/latest/download/cronhub-darwin-amd64.tar.gz | tar xz -C "$tmpdir" && cd "$tmpdir" && bash install.sh install; cd - && rm -rf "$tmpdir"
 ```
 
 The installer will prompt for a port and optional access token, then configure the service (systemd on Linux, launchd on macOS).
