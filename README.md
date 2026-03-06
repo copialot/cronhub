@@ -26,7 +26,7 @@ A modern, self-hosted cron job management system with a web UI.
 Auto-detects OS and architecture, downloads the latest release, and installs as a system service:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/copialot/cronhub/main/get.sh | bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/copialot/cronhub/main/get.sh)"
 ```
 
 The installer will prompt for a port and optional access token, then configure the service (systemd on Linux, launchd on macOS).

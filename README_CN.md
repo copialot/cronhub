@@ -22,7 +22,7 @@
 自动检测系统和架构，下载最新版本并安装为系统服务：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/copialot/cronhub/main/get.sh | bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/copialot/cronhub/main/get.sh)"
 ```
 
 安装程序会提示设置端口和可选的访问口令，然后配置系统服务（Linux 使用 systemd，macOS 使用 launchd）。

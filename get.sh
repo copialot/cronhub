@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # CronHub one-line installer
-# Usage: curl -fsSL https://raw.githubusercontent.com/copialot/cronhub/main/get.sh | bash
+# Usage: bash -c "$(curl -fsSL https://raw.githubusercontent.com/copialot/cronhub/main/get.sh)"
 
 REPO="copialot/cronhub"
 
@@ -22,9 +22,6 @@ trap 'rm -rf "$tmpdir"' EXIT
 echo "Downloading cronhub-${OS}-${ARCH}..."
 curl -fsSL "$URL" | tar xz -C "$tmpdir"
 cd "$tmpdir"
-
-# Restore stdin from terminal so interactive prompts work under curl|bash
-exec < /dev/tty
 
 if [ "$OS" = "linux" ] && [ "$(id -u)" -ne 0 ]; then
   echo "Linux install requires root. Re-running with sudo..."
