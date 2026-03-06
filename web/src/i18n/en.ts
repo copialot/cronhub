@@ -107,6 +107,11 @@ const en = {
   'settings.msg.testSuccess': 'Test sent successfully',
   'settings.msg.testFailed': 'Test send failed',
 
+  // Version
+  'version.newAvailable': 'New version available: {version}',
+  'version.current': 'Current: {version}',
+  'version.update': 'Run "cronhub update" to upgrade',
+
   // Login
   'login.prompt': 'Enter access token',
   'login.placeholder': 'Access token',

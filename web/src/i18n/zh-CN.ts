@@ -107,6 +107,11 @@ const zhCN = {
   'settings.msg.testSuccess': '测试发送成功',
   'settings.msg.testFailed': '测试发送失败',
 
+  // Version
+  'version.newAvailable': '发现新版本: {version}',
+  'version.current': '当前: {version}',
+  'version.update': '运行 "cronhub update" 升级',
+
   // Login
   'login.prompt': '请输入访问口令',
   'login.placeholder': '访问口令',

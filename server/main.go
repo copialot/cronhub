@@ -1,7 +1,9 @@
 package main
 
 import (
+	"crypto/sha256"
 	"crypto/subtle"
+	"encoding/hex"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,6 +11,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"cronhub/cmd"
 	"cronhub/config"
 	"cronhub/db"
 	"cronhub/internal/handler"
@@ -22,7 +25,22 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Version 通过 ldflags 注入
+var Version = "dev"
+
 func main() {
+	// 子命令分发
+	if len(os.Args) > 1 {
+		switch os.Args[1] {
+		case "update":
+			cmd.RunUpdate(Version)
+			return
+		case "version":
+			fmt.Printf("CronHub %s\n", Version)
+			return
+		}
+	}
+
 	cfg := config.Load()
 
 	// 初始化数据库
@@ -96,11 +114,13 @@ func main() {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "请提供口令"})
 				return
 			}
-			if subtle.ConstantTimeCompare([]byte(req.Token), []byte(cfg.AuthToken)) != 1 {
+			hash := sha256.Sum256([]byte(req.Token))
+			hashedInput := hex.EncodeToString(hash[:])
+			if subtle.ConstantTimeCompare([]byte(hashedInput), []byte(cfg.AuthToken)) != 1 {
 				c.JSON(http.StatusUnauthorized, gin.H{"error": "口令错误"})
 				return
 			}
-			c.JSON(http.StatusOK, gin.H{"ok": true, "token": cfg.AuthToken})
+			c.JSON(http.StatusOK, gin.H{"ok": true, "token": hashedInput})
 		})
 		api.GET("/auth/check", func(c *gin.Context) {
 			// 若无鉴权直接返回
@@ -120,6 +140,12 @@ func main() {
 			}
 			ok := provided != "" && subtle.ConstantTimeCompare([]byte(provided), []byte(cfg.AuthToken)) == 1
 			c.JSON(http.StatusOK, gin.H{"auth_required": true, "authenticated": ok})
+		})
+
+		// 版本信息
+		api.GET("/version", func(c *gin.Context) {
+			info := cmd.CheckVersion(Version)
+			c.JSON(http.StatusOK, info)
 		})
 
 		// 任务
@@ -181,7 +207,7 @@ func main() {
 		log.Println("口令鉴权已启用")
 	}
 	addr := fmt.Sprintf(":%d", cfg.Port)
-	log.Printf("CronHub 启动在 %s", addr)
+	log.Printf("CronHub %s 启动在 %s", Version, addr)
 	if err := r.Run(addr); err != nil {
 		log.Fatalf("启动服务器失败: %v", err)
 	}

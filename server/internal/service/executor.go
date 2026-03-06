@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
 	"os/exec"
 	"strings"
 	"sync"
@@ -132,7 +133,8 @@ func (e *Executor) runCommand(task *model.Task, roomID string) (exitCode int, st
 		cmd.Dir = task.WorkingDir
 	}
 
-	// 设置环境变量
+	// 设置环境变量：继承父进程环境，再追加任务自定义变量
+	cmd.Env = os.Environ()
 	if task.EnvVars != nil {
 		for k, v := range task.EnvVars {
 			cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", k, v))

@@ -1,4 +1,5 @@
-import { Layout, Menu, Button, Tooltip, Dropdown } from 'antd';
+import { useState, useEffect } from 'react';
+import { Layout, Menu, Button, Tooltip, Dropdown, Badge } from 'antd';
 import {
   DashboardOutlined,
   ScheduleOutlined,
@@ -8,11 +9,13 @@ import {
   MoonOutlined,
   LogoutOutlined,
   GlobalOutlined,
+  ArrowUpOutlined,
 } from '@ant-design/icons';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '../../hooks/useTheme';
 import { useLocale } from '../../hooks/useLocale';
 import { localeLabels, type Locale } from '../../i18n';
+import { versionApi } from '../../api/client';
 import Logo from '../common/Logo';
 
 const { Sider, Content, Header } = Layout;
@@ -22,6 +25,11 @@ export default function AppLayout() {
   const location = useLocation();
   const { mode, toggle } = useTheme();
   const { locale, setLocale, t } = useLocale();
+  const [versionInfo, setVersionInfo] = useState<{ current: string; latest: string; has_new: boolean } | null>(null);
+
+  useEffect(() => {
+    versionApi.check().then(setVersionInfo).catch(() => {});
+  }, []);
 
   const menuItems = [
     { key: '/', icon: <DashboardOutlined />, label: t('menu.dashboard') },
@@ -108,6 +116,18 @@ export default function AppLayout() {
             {currentPage?.label || 'Dashboard'}
           </span>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            {versionInfo?.has_new && (
+              <Tooltip title={`${t('version.newAvailable').replace('{version}', versionInfo.latest)} — ${t('version.update')}`}>
+                <Badge dot>
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<ArrowUpOutlined />}
+                    style={{ color: '#52c41a' }}
+                  />
+                </Badge>
+              </Tooltip>
+            )}
             <Dropdown
               menu={{
                 items: langMenuItems,

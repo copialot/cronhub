@@ -67,6 +67,12 @@ prompt_config() {
 
     read -rp "$(echo -e "${CYAN}访问口令 (留空不启用鉴权): ${NC}")" input_token < /dev/tty
     AUTH_TOKEN="${input_token:-$AUTH_TOKEN}"
+
+    # 对口令进行 SHA-256 hash
+    if [ -n "$AUTH_TOKEN" ]; then
+        AUTH_TOKEN=$(printf '%s' "$AUTH_TOKEN" | shasum -a 256 | cut -d' ' -f1)
+        ok "口令已 SHA-256 哈希处理"
+    fi
 }
 
 install_linux() {
@@ -166,6 +172,12 @@ install_macos() {
     cp "$BINARY" "$MACOS_BIN"
     chmod +x "$MACOS_BIN"
     ok "二进制安装到: $MACOS_BIN"
+
+    # 创建 symlink 到 /usr/local/bin
+    if [ -d "/usr/local/bin" ]; then
+        ln -sf "$MACOS_BIN" /usr/local/bin/cronhub
+        ok "已创建命令: /usr/local/bin/cronhub"
+    fi
 
     # 写入环境变量配置
     cat > "$MACOS_CONFIG" <<EOF

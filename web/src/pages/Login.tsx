@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Input, Button, message } from 'antd';
 import { LockOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
 import { authApi } from '../api/client';
 import { useLocale } from '../hooks/useLocale';
 import Logo from '../components/common/Logo';
@@ -9,7 +8,6 @@ import Logo from '../components/common/Logo';
 export default function Login() {
   const [token, setToken] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
   const { t } = useLocale();
 
   const handleLogin = async () => {
@@ -22,7 +20,7 @@ export default function Login() {
       const res = await authApi.login(token.trim());
       if (res.ok && res.token) {
         localStorage.setItem('cronhub_auth_token', res.token);
-        navigate('/', { replace: true });
+        window.location.href = '/';
       }
     } catch {
       message.error(t('login.msg.wrong'));

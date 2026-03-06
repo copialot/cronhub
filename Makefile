@@ -16,8 +16,9 @@ build-web:
 	cd web && pnpm build
 
 # 构建后端 (嵌入前端)
+VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
 build: build-web
-	cd server && CGO_ENABLED=1 go build -o ../cronhub .
+	cd server && CGO_ENABLED=1 go build -ldflags "-s -w -X main.Version=$(VERSION)" -o ../cronhub .
 
 # 运行构建产物
 run: build

@@ -90,6 +90,12 @@ export const statsApi = {
     api.get<DailyStats[]>('/stats/chart', { params: { range } }).then(r => r.data),
 };
 
+// 版本
+export const versionApi = {
+  check: () =>
+    api.get<{ current: string; latest: string; has_new: boolean }>('/version').then(r => r.data),
+};
+
 // 告警
 export const alertApi = {
   list: () =>

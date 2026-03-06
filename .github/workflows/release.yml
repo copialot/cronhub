@@ -72,7 +72,7 @@ jobs:
             export CC=aarch64-linux-gnu-gcc
           fi
           cd server
-          go build -ldflags "-s -w" -o ../cronhub .
+          go build -ldflags "-s -w -X main.Version=${GITHUB_REF_NAME}" -o ../cronhub .
 
       - name: Compress binary
         run: |

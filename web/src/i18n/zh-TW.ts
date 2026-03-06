@@ -107,6 +107,11 @@ const zhTW = {
   'settings.msg.testSuccess': '測試發送成功',
   'settings.msg.testFailed': '測試發送失敗',
 
+  // Version
+  'version.newAvailable': '發現新版本: {version}',
+  'version.current': '目前: {version}',
+  'version.update': '執行 "cronhub update" 升級',
+
   // Login
   'login.prompt': '請輸入存取口令',
   'login.placeholder': '存取口令',
