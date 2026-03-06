@@ -72,12 +72,12 @@ jobs:
             export CC=aarch64-linux-gnu-gcc
           fi
           cd server
-          go build -ldflags "-s -w" -o ../cronhub-${{ matrix.os }}-${{ matrix.arch }} .
+          go build -ldflags "-s -w" -o ../cronhub .
 
       - name: Compress binary
         run: |
           tar czf cronhub-${{ matrix.os }}-${{ matrix.arch }}.tar.gz \
-            cronhub-${{ matrix.os }}-${{ matrix.arch }} \
+            cronhub \
             install.sh
 
       - name: Upload artifact
