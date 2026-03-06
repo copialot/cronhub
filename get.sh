@@ -23,6 +23,9 @@ echo "Downloading cronhub-${OS}-${ARCH}..."
 curl -fsSL "$URL" | tar xz -C "$tmpdir"
 cd "$tmpdir"
 
+# Restore stdin from terminal so interactive prompts work under curl|bash
+exec < /dev/tty
+
 if [ "$OS" = "linux" ] && [ "$(id -u)" -ne 0 ]; then
   echo "Linux install requires root. Re-running with sudo..."
   sudo bash install.sh install
