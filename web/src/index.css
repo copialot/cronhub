@@ -1,0 +1,208 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* ========== 暗色主题 ========== */
+:root,
+[data-theme="dark"] {
+  --bg-primary: #0a0f14;
+  --bg-secondary: #111820;
+  --bg-card: #161e28;
+  --bg-hover: #1c2634;
+  --border-color: #1e2a3a;
+  --accent-primary: #00d4aa;
+  --accent-success: #f0b429;
+  --accent-danger: #ef4444;
+  --accent-info: #38bdf8;
+  --text-primary: #e2e8f0;
+  --text-secondary: #64748b;
+  --log-bg: #0d1117;
+  --shadow-hover: rgba(0, 0, 0, 0.3);
+  --font-mono: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+  --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ========== 亮色主题 ========== */
+[data-theme="light"] {
+  --bg-primary: #f5f7fa;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --bg-hover: #f0f2f5;
+  --border-color: #e2e8f0;
+  --accent-primary: #059669;
+  --accent-success: #d97706;
+  --accent-danger: #dc2626;
+  --accent-info: #0284c7;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --log-bg: #f8fafc;
+  --shadow-hover: rgba(0, 0, 0, 0.08);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* Ant Design 覆盖 */
+.ant-layout {
+  background: var(--bg-primary) !important;
+}
+
+.ant-layout-sider {
+  background: var(--bg-secondary) !important;
+}
+
+.ant-card {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 8px !important;
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.ant-table {
+  background: transparent !important;
+}
+
+.ant-table-thead > tr > th,
+.ant-table-thead > tr > td {
+  background: var(--bg-secondary) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  color: var(--text-secondary) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 12px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+.ant-table-tbody > tr > td {
+  border-bottom: 1px solid var(--border-color) !important;
+  transition: background 0.15s;
+}
+
+/* 修复: 用 td 的 box-shadow 代替 tr::before，避免行错位 */
+.ant-table-tbody > tr:hover > td {
+  background: var(--bg-hover) !important;
+}
+
+.ant-table-tbody > tr:hover > td:first-child {
+  box-shadow: inset 3px 0 0 0 var(--accent-primary);
+}
+
+/* 滚动条 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* 日志查看器 */
+.log-viewer {
+  background: var(--log-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  overflow: auto;
+  max-height: 500px;
+  position: relative;
+}
+
+[data-theme="dark"] .log-viewer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 212, 170, 0.01) 0px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events: none;
+  border-radius: 8px;
+}
+
+.log-line {
+  padding: 1px 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+  animation: logFadeIn 0.15s ease-out;
+}
+
+.log-line.stdout { color: var(--text-primary); }
+.log-line.stderr { color: var(--accent-danger); }
+.log-line.start, .log-line.finish { color: var(--accent-info); }
+.log-line.retry { color: var(--accent-success); }
+
+@keyframes logFadeIn {
+  from { opacity: 0; transform: translateY(2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 状态指示灯 */
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.status-dot.running {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* 统计卡片 */
+.stat-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px var(--shadow-hover);
+}
+
+.stat-value {
+  font-family: var(--font-mono);
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* 页面过渡 */
+.page-enter {
+  animation: pageIn 0.15s ease-out;
+}
+
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}

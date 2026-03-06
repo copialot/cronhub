@@ -1,0 +1,39 @@
+# Binary
+cronhub
+
+# Go
+server/cronhub
+
+# Node
+web/node_modules/
+web/dist/
+
+# Build artifacts
+server/static/dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+*.env.local
+
+# Data
+data/
+*.db
+*.db-wal
+*.db-shm
+
+# Logs
+*.log
+
+# pnpm
+web/.pnpm-approve-builds.json
