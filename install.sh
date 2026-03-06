@@ -62,10 +62,10 @@ prompt_config() {
     PORT="${CRONHUB_PORT:-8080}"
     AUTH_TOKEN="${CRONHUB_AUTH_TOKEN:-}"
 
-    read -rp "$(echo -e "${CYAN}服务端口 [${PORT}]: ${NC}")" input_port
+    read -rp "$(echo -e "${CYAN}服务端口 [${PORT}]: ${NC}")" input_port < /dev/tty
     PORT="${input_port:-$PORT}"
 
-    read -rp "$(echo -e "${CYAN}访问口令 (留空不启用鉴权): ${NC}")" input_token
+    read -rp "$(echo -e "${CYAN}访问口令 (留空不启用鉴权): ${NC}")" input_token < /dev/tty
     AUTH_TOKEN="${input_token:-$AUTH_TOKEN}"
 }
 
