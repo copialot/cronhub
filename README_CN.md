@@ -19,20 +19,10 @@
 
 ## 快速安装
 
-下载最新 Release 并安装为系统服务：
+自动检测系统和架构，下载最新版本并安装为系统服务：
 
 ```bash
-# Linux (amd64)
-tmpdir=$(mktemp -d) && curl -fsSL https://github.com/copialot/cronhub/releases/latest/download/cronhub-linux-amd64.tar.gz | tar xz -C "$tmpdir" && cd "$tmpdir" && sudo bash install.sh install; cd - && rm -rf "$tmpdir"
-
-# Linux (arm64)
-tmpdir=$(mktemp -d) && curl -fsSL https://github.com/copialot/cronhub/releases/latest/download/cronhub-linux-arm64.tar.gz | tar xz -C "$tmpdir" && cd "$tmpdir" && sudo bash install.sh install; cd - && rm -rf "$tmpdir"
-
-# macOS (Apple Silicon)
-tmpdir=$(mktemp -d) && curl -fsSL https://github.com/copialot/cronhub/releases/latest/download/cronhub-darwin-arm64.tar.gz | tar xz -C "$tmpdir" && cd "$tmpdir" && bash install.sh install; cd - && rm -rf "$tmpdir"
-
-# macOS (Intel)
-tmpdir=$(mktemp -d) && curl -fsSL https://github.com/copialot/cronhub/releases/latest/download/cronhub-darwin-amd64.tar.gz | tar xz -C "$tmpdir" && cd "$tmpdir" && bash install.sh install; cd - && rm -rf "$tmpdir"
+curl -fsSL https://raw.githubusercontent.com/copialot/cronhub/main/get.sh | bash
 ```
 
 安装程序会提示设置端口和可选的访问口令，然后配置系统服务（Linux 使用 systemd，macOS 使用 launchd）。

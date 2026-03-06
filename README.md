@@ -23,20 +23,10 @@ A modern, self-hosted cron job management system with a web UI.
 
 ## Quick Install
 
-Download the latest release and install as a system service:
+Auto-detects OS and architecture, downloads the latest release, and installs as a system service:
 
 ```bash
-# Linux (amd64)
-tmpdir=$(mktemp -d) && curl -fsSL https://github.com/copialot/cronhub/releases/latest/download/cronhub-linux-amd64.tar.gz | tar xz -C "$tmpdir" && cd "$tmpdir" && sudo bash install.sh install; cd - && rm -rf "$tmpdir"
-
-# Linux (arm64)
-tmpdir=$(mktemp -d) && curl -fsSL https://github.com/copialot/cronhub/releases/latest/download/cronhub-linux-arm64.tar.gz | tar xz -C "$tmpdir" && cd "$tmpdir" && sudo bash install.sh install; cd - && rm -rf "$tmpdir"
-
-# macOS (Apple Silicon)
-tmpdir=$(mktemp -d) && curl -fsSL https://github.com/copialot/cronhub/releases/latest/download/cronhub-darwin-arm64.tar.gz | tar xz -C "$tmpdir" && cd "$tmpdir" && bash install.sh install; cd - && rm -rf "$tmpdir"
-
-# macOS (Intel)
-tmpdir=$(mktemp -d) && curl -fsSL https://github.com/copialot/cronhub/releases/latest/download/cronhub-darwin-amd64.tar.gz | tar xz -C "$tmpdir" && cd "$tmpdir" && bash install.sh install; cd - && rm -rf "$tmpdir"
+curl -fsSL https://raw.githubusercontent.com/copialot/cronhub/main/get.sh | bash
 ```
 
 The installer will prompt for a port and optional access token, then configure the service (systemd on Linux, launchd on macOS).
