@@ -133,8 +133,22 @@ func (e *Executor) runCommand(task *model.Task, roomID string) (exitCode int, st
 		cmd.Dir = task.WorkingDir
 	}
 
-	// 设置环境变量：继承父进程环境，再追加任务自定义变量
-	cmd.Env = os.Environ()
+	// 设置环境变量：继承父进程环境，补全常见 PATH，再追加任务自定义变量
+	env := os.Environ()
+	extraPaths := []string{"/usr/local/bin", "/usr/local/sbin", "/opt/homebrew/bin", "/opt/homebrew/sbin"}
+	for i, e := range env {
+		if strings.HasPrefix(e, "PATH=") {
+			p := e[5:]
+			for _, ep := range extraPaths {
+				if !strings.Contains(":"+p+":", ":"+ep+":") {
+					p = p + ":" + ep
+				}
+			}
+			env[i] = "PATH=" + p
+			break
+		}
+	}
+	cmd.Env = env
 	if task.EnvVars != nil {
 		for k, v := range task.EnvVars {
 			cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", k, v))

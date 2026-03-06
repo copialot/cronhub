@@ -116,16 +116,30 @@ export default function AppLayout() {
             {currentPage?.label || 'Dashboard'}
           </span>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            {versionInfo?.has_new && (
-              <Tooltip title={`${t('version.newAvailable').replace('{version}', versionInfo.latest)} — ${t('version.update')}`}>
-                <Badge dot>
-                  <Button
-                    type="text"
-                    size="small"
-                    icon={<ArrowUpOutlined />}
-                    style={{ color: '#52c41a' }}
-                  />
-                </Badge>
+            {versionInfo && (
+              <Tooltip title={versionInfo.has_new
+                ? `${t('version.newAvailable').replace('{version}', versionInfo.latest)} — ${t('version.update')}`
+                : t('version.current').replace('{version}', versionInfo.current)
+              }>
+                {versionInfo.has_new ? (
+                  <Badge dot>
+                    <Button
+                      type="text"
+                      size="small"
+                      icon={<ArrowUpOutlined />}
+                      style={{ color: '#52c41a' }}
+                    />
+                  </Badge>
+                ) : (
+                  <span style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: 11,
+                    color: 'var(--text-secondary)',
+                    opacity: 0.6,
+                  }}>
+                    {versionInfo.current}
+                  </span>
+                )}
               </Tooltip>
             )}
             <Dropdown
