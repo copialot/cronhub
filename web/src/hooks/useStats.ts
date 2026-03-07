@@ -9,11 +9,12 @@ export function useStatsOverview() {
   });
 }
 
-export function useTaskStats(taskId: number) {
+export function useTaskStats(taskId: number, refetchInterval?: number) {
   return useQuery({
     queryKey: ['stats', 'task', taskId],
     queryFn: () => statsApi.taskStats(taskId),
     enabled: !!taskId,
+    refetchInterval,
   });
 }
 
@@ -33,10 +34,11 @@ export function useRecentExecutions(limit: number = 20) {
   });
 }
 
-export function useTaskExecutions(taskId: number, limit: number = 20, offset: number = 0) {
+export function useTaskExecutions(taskId: number, limit: number = 20, offset: number = 0, refetchInterval?: number) {
   return useQuery({
     queryKey: ['executions', 'task', taskId, limit, offset],
     queryFn: () => executionApi.listByTask(taskId, { limit, offset }),
     enabled: !!taskId,
+    refetchInterval,
   });
 }

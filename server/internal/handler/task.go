@@ -218,9 +218,15 @@ func (h *TaskHandler) Run(c *gin.Context) {
 		return
 	}
 
-	go h.executor.Execute(task, model.TriggerManual)
+	execID, err := h.executor.Prepare(task, model.TriggerManual)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "创建执行记录失败"})
+		return
+	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "任务已触发"})
+	go h.executor.ExecuteWithID(task, execID)
+
+	c.JSON(http.StatusOK, gin.H{"message": "任务已触发", "execution_id": execID})
 }
 
 func parseID(c *gin.Context) (uint, error) {

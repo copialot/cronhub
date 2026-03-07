@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Descriptions, Table, Button, Space, Typography, Row, Col } from 'antd';
 import { ArrowLeftOutlined, PlayCircleOutlined, EditOutlined } from '@ant-design/icons';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import StatusBadge from '../components/common/StatusBadge';
 import LogViewer from '../components/execution/LogViewer';
 import TaskForm from '../components/task/TaskForm';
@@ -17,13 +17,34 @@ export default function TaskDetail() {
   const { id } = useParams<{ id: string }>();
   const taskId = Number(id);
   const navigate = useNavigate();
-  const { data: task } = useTask(taskId);
-  const { data: execData } = useTaskExecutions(taskId);
-  const { data: stats } = useTaskStats(taskId);
-  const runTask = useRunTask();
   const [formOpen, setFormOpen] = useState(false);
   const [selectedExec, setSelectedExec] = useState<ExecutionLog | null>(null);
+  const [liveExecId, setLiveExecId] = useState<number | null>(null);
   const { t } = useLocale();
+
+  const isRunning = liveExecId !== null;
+
+  const { data: task } = useTask(taskId, isRunning ? 2000 : undefined);
+  const { data: execData } = useTaskExecutions(taskId, 20, 0, isRunning ? 2000 : undefined);
+  const { data: stats } = useTaskStats(taskId, isRunning ? 2000 : undefined);
+  const runTask = useRunTask();
+
+  const handleRun = useCallback(() => {
+    runTask.mutate(taskId, {
+      onSuccess: (data) => {
+        const execId = data.execution_id;
+        if (execId) {
+          setLiveExecId(execId);
+          setSelectedExec({ id: execId, status: 'running' } as ExecutionLog);
+        }
+      },
+    });
+  }, [runTask, taskId]);
+
+  // WebSocket finish 时停止轮询
+  const handleLogFinish = useCallback(() => {
+    setLiveExecId(null);
+  }, []);
 
   const columns = [
     { title: '#', dataIndex: 'id', key: 'id', width: 60 },
@@ -36,7 +57,10 @@ export default function TaskDetail() {
       title: t('col.log'),
       key: 'log',
       render: (_: unknown, record: ExecutionLog) => (
-        <Button type="link" size="small" onClick={() => setSelectedExec(record)}>
+        <Button type="link" size="small" onClick={() => {
+          setSelectedExec(record);
+          setLiveExecId(record.status === 'running' ? record.id : null);
+        }}>
           {t('taskDetail.view')}
         </Button>
       ),
@@ -57,7 +81,13 @@ export default function TaskDetail() {
         </Space>
         <Space>
           <Button icon={<EditOutlined />} onClick={() => setFormOpen(true)}>{t('taskDetail.edit')}</Button>
-          <Button type="primary" icon={<PlayCircleOutlined />} onClick={() => runTask.mutate(taskId)}>
+          <Button
+            type="primary"
+            icon={<PlayCircleOutlined />}
+            onClick={handleRun}
+            loading={runTask.isPending}
+            disabled={task.status === 'running'}
+          >
             {t('taskDetail.runManually')}
           </Button>
         </Space>
@@ -117,16 +147,17 @@ export default function TaskDetail() {
           title={
             <Space>
               <span style={{ fontFamily: 'var(--font-mono)' }}>{t('taskDetail.execLog')} #{selectedExec.id}</span>
-              <StatusBadge status={selectedExec.status} />
+              <StatusBadge status={liveExecId === selectedExec.id ? 'running' : selectedExec.status} />
             </Space>
           }
           style={{ marginTop: 16 }}
-          extra={<Button type="text" onClick={() => setSelectedExec(null)}>{t('taskDetail.close')}</Button>}
+          extra={<Button type="text" onClick={() => { setSelectedExec(null); setLiveExecId(null); }}>{t('taskDetail.close')}</Button>}
         >
           <LogViewer
-            executionId={selectedExec.status === 'running' ? selectedExec.id : null}
+            executionId={liveExecId === selectedExec.id ? selectedExec.id : (selectedExec.status === 'running' ? selectedExec.id : null)}
             staticOutput={selectedExec.output}
             staticError={selectedExec.error_output}
+            onFinish={handleLogFinish}
           />
         </Card>
       )}

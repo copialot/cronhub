@@ -10,11 +10,12 @@ export function useTasks(groupId?: number) {
   });
 }
 
-export function useTask(id: number) {
+export function useTask(id: number, refetchInterval?: number) {
   return useQuery({
     queryKey: ['task', id],
     queryFn: () => taskApi.get(id),
     enabled: !!id,
+    refetchInterval,
   });
 }
 
@@ -69,9 +70,12 @@ export function useToggleTask() {
 export function useRunTask() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (id: number) => taskApi.run(id),
+    mutationFn: (id: number) => taskApi.run(id) as Promise<{ message: string; execution_id: number }>,
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['tasks'] });
+      qc.invalidateQueries({ queryKey: ['task'] });
+      qc.invalidateQueries({ queryKey: ['executions'] });
+      qc.invalidateQueries({ queryKey: ['stats'] });
       message.success('任务已触发执行');
     },
     onError: () => message.error('触发失败'),

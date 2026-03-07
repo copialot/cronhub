@@ -47,7 +47,8 @@ type wsMessage struct {
 	Data string `json:"data"`
 }
 
-func (e *Executor) Execute(task *model.Task, triggerType model.TriggerType) {
+// Prepare 同步创建执行记录并返回 ID，供 Handler 先返回给前端
+func (e *Executor) Prepare(task *model.Task, triggerType model.TriggerType) (uint, error) {
 	now := time.Now()
 	execLog := &model.ExecutionLog{
 		TaskID:      task.ID,
@@ -55,21 +56,25 @@ func (e *Executor) Execute(task *model.Task, triggerType model.TriggerType) {
 		TriggerType: triggerType,
 		StartedAt:   now,
 	}
-
 	if err := e.logRepo.Create(execLog); err != nil {
-		log.Printf("创建执行记录失败: %v", err)
+		return 0, err
+	}
+	e.taskRepo.UpdateStatus(task.ID, model.TaskStatusRunning)
+	return execLog.ID, nil
+}
+
+// ExecuteWithID 使用已创建的 executionId 执行任务
+func (e *Executor) ExecuteWithID(task *model.Task, execID uint) {
+	execLog, err := e.logRepo.GetByID(execID)
+	if err != nil {
+		log.Printf("获取执行记录失败: %v", err)
 		return
 	}
-
-	// 更新任务状态
-	e.taskRepo.UpdateStatus(task.ID, model.TaskStatusRunning)
-
+	now := execLog.StartedAt
 	roomID := fmt.Sprintf("exec_%d", execLog.ID)
 
-	// 广播执行开始
 	e.broadcastWS(roomID, "start", fmt.Sprintf("开始执行任务: %s", task.Name))
 
-	// 执行命令（带重试）
 	var exitCode int
 	var output, errOutput string
 	var success bool
@@ -89,11 +94,9 @@ func (e *Executor) Execute(task *model.Task, triggerType model.TriggerType) {
 	finished := time.Now()
 	duration := finished.Sub(now).Milliseconds()
 
-	// 截断输出
 	output = truncate(output, maxOutputSize)
 	errOutput = truncate(errOutput, maxOutputSize)
 
-	// 更新执行记录
 	execLog.ExitCode = &exitCode
 	execLog.Output = output
 	execLog.ErrorOutput = errOutput
@@ -109,21 +112,27 @@ func (e *Executor) Execute(task *model.Task, triggerType model.TriggerType) {
 	}
 
 	e.logRepo.Update(execLog)
-
-	// 更新 last_run_at
 	e.taskRepo.UpdateLastRunAt(task.ID, now)
 
-	// 广播执行完成
 	status := "success"
 	if !success {
 		status = "failed"
 	}
 	e.broadcastWS(roomID, "finish", fmt.Sprintf("执行完成: %s, 耗时: %dms", status, duration))
 
-	// 触发告警
 	if e.alertSvc != nil {
 		e.alertSvc.Check(task, execLog)
 	}
+}
+
+// Execute 保留原有接口供调度器调用
+func (e *Executor) Execute(task *model.Task, triggerType model.TriggerType) {
+	execID, err := e.Prepare(task, triggerType)
+	if err != nil {
+		log.Printf("创建执行记录失败: %v", err)
+		return
+	}
+	e.ExecuteWithID(task, execID)
 }
 
 func (e *Executor) runCommand(task *model.Task, roomID string) (exitCode int, stdout, stderr string) {

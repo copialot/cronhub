@@ -6,18 +6,35 @@ interface LogViewerProps {
   executionId: number | null;
   staticOutput?: string;
   staticError?: string;
+  onFinish?: () => void;
 }
 
-export default function LogViewer({ executionId, staticOutput, staticError }: LogViewerProps) {
+export default function LogViewer({ executionId, staticOutput, staticError, onFinish }: LogViewerProps) {
   const { messages } = useWebSocket(executionId);
   const containerRef = useRef<HTMLDivElement>(null);
   const { t } = useLocale();
+  const finishCalledRef = useRef(false);
 
   useEffect(() => {
     if (containerRef.current) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
     }
   }, [messages]);
+
+  // 检测 finish 消息
+  useEffect(() => {
+    if (!onFinish || finishCalledRef.current) return;
+    const hasFinish = messages.some(msg => msg.type === 'finish');
+    if (hasFinish) {
+      finishCalledRef.current = true;
+      onFinish();
+    }
+  }, [messages, onFinish]);
+
+  // executionId 变化时重置
+  useEffect(() => {
+    finishCalledRef.current = false;
+  }, [executionId]);
 
   const hasWsMessages = messages.length > 0;
 
