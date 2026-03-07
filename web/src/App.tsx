@@ -11,6 +11,8 @@ import TaskList from './pages/TaskList';
 import TaskDetail from './pages/TaskDetail';
 import ExecutionHistory from './pages/ExecutionHistory';
 import Settings from './pages/Settings';
+import ScriptList from './pages/ScriptList';
+import ScriptEdit from './pages/ScriptEdit';
 import Login from './pages/Login';
 import { ThemeContext, type ThemeMode } from './hooks/useTheme';
 import { LocaleContext, createT } from './hooks/useLocale';
@@ -164,6 +166,9 @@ function App() {
                     <Route path="/" element={<Dashboard />} />
                     <Route path="/tasks" element={<TaskList />} />
                     <Route path="/tasks/:id" element={<TaskDetail />} />
+                    <Route path="/scripts" element={<ScriptList />} />
+                    <Route path="/scripts/new" element={<ScriptEdit />} />
+                    <Route path="/scripts/:id" element={<ScriptEdit />} />
                     <Route path="/history" element={<ExecutionHistory />} />
                     <Route path="/settings" element={<Settings />} />
                   </Route>

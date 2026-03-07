@@ -30,6 +30,7 @@ func Init(dbPath string) *gorm.DB {
 		&model.Task{},
 		&model.ExecutionLog{},
 		&model.AlertConfig{},
+		&model.Script{},
 	); err != nil {
 		log.Fatalf("数据库迁移失败: %v", err)
 	}

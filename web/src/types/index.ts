@@ -112,6 +112,24 @@ export interface CreateGroupRequest {
   sort_order?: number;
 }
 
+export interface Script {
+  id: number;
+  name: string;
+  language: 'shell' | 'python' | 'node';
+  description: string;
+  filename: string;
+  content?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateScriptRequest {
+  name: string;
+  language: string;
+  description?: string;
+  content?: string;
+}
+
 export interface CreateAlertRequest {
   task_id?: number | null;
   type: 'email' | 'webhook' | 'slack' | 'dingtalk' | 'feishu' | 'telegram';

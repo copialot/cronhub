@@ -5,6 +5,8 @@ const en = {
   'menu.history': 'Execution History',
   'menu.settings': 'Settings',
 
+  'menu.scripts': 'Scripts',
+
   // AppLayout - Header
   'header.theme.light': 'Light Mode',
   'header.theme.dark': 'Dark Mode',
@@ -179,6 +181,26 @@ const en = {
   'taskForm.timeout': 'Timeout (s)',
   'taskForm.retryCount': 'Retry Count',
   'taskForm.enabled': 'Enabled',
+  'taskForm.refScript': 'Use Script',
+  'taskForm.selectScript': 'Select a script',
+
+  // ScriptList
+  'scriptList.title': 'Script Library',
+  'scriptList.create': 'Create Script',
+  'scriptList.col.name': 'Name',
+  'scriptList.col.language': 'Language',
+  'scriptList.col.description': 'Description',
+  'scriptList.col.updatedAt': 'Updated',
+  'scriptList.deleteConfirm': 'Delete this script?',
+
+  // ScriptEdit
+  'scriptEdit.namePlaceholder': 'Script name',
+  'scriptEdit.descriptionPlaceholder': 'Description (optional)',
+  'scriptEdit.nameRequired': 'Please enter script name',
+  'scriptEdit.create': 'Create',
+  'scriptEdit.save': 'Save',
+  'scriptEdit.createSuccess': 'Script created',
+  'scriptEdit.saveSuccess': 'Script saved',
 };
 
 export default en;

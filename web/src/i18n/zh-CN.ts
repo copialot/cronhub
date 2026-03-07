@@ -5,6 +5,8 @@ const zhCN = {
   'menu.history': '执行历史',
   'menu.settings': '系统设置',
 
+  'menu.scripts': '脚本库',
+
   // AppLayout - Header
   'header.theme.light': '亮色模式',
   'header.theme.dark': '暗色模式',
@@ -179,6 +181,26 @@ const zhCN = {
   'taskForm.timeout': '超时(秒)',
   'taskForm.retryCount': '重试次数',
   'taskForm.enabled': '启用',
+  'taskForm.refScript': '引用脚本',
+  'taskForm.selectScript': '选择脚本',
+
+  // ScriptList
+  'scriptList.title': '脚本库',
+  'scriptList.create': '创建脚本',
+  'scriptList.col.name': '名称',
+  'scriptList.col.language': '语言',
+  'scriptList.col.description': '描述',
+  'scriptList.col.updatedAt': '更新时间',
+  'scriptList.deleteConfirm': '确定删除此脚本？',
+
+  // ScriptEdit
+  'scriptEdit.namePlaceholder': '脚本名称',
+  'scriptEdit.descriptionPlaceholder': '描述（可选）',
+  'scriptEdit.nameRequired': '请输入脚本名称',
+  'scriptEdit.create': '创建',
+  'scriptEdit.save': '保存',
+  'scriptEdit.createSuccess': '脚本创建成功',
+  'scriptEdit.saveSuccess': '脚本保存成功',
 };
 
 export default zhCN;

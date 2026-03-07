@@ -22,10 +22,11 @@ import (
 const maxOutputSize = 64 * 1024 // 64KB
 
 type Executor struct {
-	taskRepo *repository.TaskRepo
-	logRepo  *repository.ExecutionLogRepo
-	hub      *ws.Hub
-	alertSvc *AlertService
+	taskRepo  *repository.TaskRepo
+	logRepo   *repository.ExecutionLogRepo
+	hub       *ws.Hub
+	alertSvc  *AlertService
+	scriptSvc *ScriptService
 }
 
 func NewExecutor(taskRepo *repository.TaskRepo, logRepo *repository.ExecutionLogRepo, hub *ws.Hub, alertSvc *AlertService) *Executor {
@@ -35,6 +36,10 @@ func NewExecutor(taskRepo *repository.TaskRepo, logRepo *repository.ExecutionLog
 		hub:      hub,
 		alertSvc: alertSvc,
 	}
+}
+
+func (e *Executor) SetScriptService(svc *ScriptService) {
+	e.scriptSvc = svc
 }
 
 type wsMessage struct {
@@ -129,7 +134,21 @@ func (e *Executor) runCommand(task *model.Task, roomID string) (exitCode int, st
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	cmd := exec.Command("sh", "-c", task.Command)
+	command := task.Command
+	if e.scriptSvc != nil && strings.HasPrefix(command, "#!script:") {
+		scriptName := strings.TrimSpace(strings.TrimPrefix(command, "#!script:"))
+		script, err := e.scriptSvc.GetByName(scriptName)
+		if err != nil {
+			errMsg := fmt.Sprintf("脚本不存在: %s", scriptName)
+			e.broadcastWS(roomID, "stderr", errMsg)
+			return 1, "", errMsg
+		}
+		interpreter := e.scriptSvc.GetInterpreter(script.Language)
+		scriptPath := e.scriptSvc.GetScriptPath(script)
+		command = fmt.Sprintf("%s %s", interpreter, scriptPath)
+	}
+
+	cmd := exec.Command("sh", "-c", command)
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	if task.WorkingDir != "" {
 		cmd.Dir = task.WorkingDir

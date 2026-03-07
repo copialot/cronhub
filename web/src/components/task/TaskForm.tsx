@@ -1,9 +1,11 @@
 import { Drawer, Form, Input, Select, InputNumber, Switch, Button, Space } from 'antd';
+import { CodeOutlined } from '@ant-design/icons';
 import CronEditor from './CronEditor';
 import { useGroups, useCreateTask, useUpdateTask } from '../../hooks/useTasks';
+import { useScripts } from '../../hooks/useScripts';
 import { useLocale } from '../../hooks/useLocale';
 import type { Task, CreateTaskRequest } from '../../types';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface TaskFormProps {
   open: boolean;
@@ -14,9 +16,11 @@ interface TaskFormProps {
 export default function TaskForm({ open, onClose, task }: TaskFormProps) {
   const [form] = Form.useForm();
   const { data: groups } = useGroups();
+  const { data: scripts } = useScripts();
   const createTask = useCreateTask();
   const updateTask = useUpdateTask();
   const { t } = useLocale();
+  const [scriptSelectOpen, setScriptSelectOpen] = useState(false);
 
   useEffect(() => {
     if (open && task) {
@@ -96,12 +100,42 @@ export default function TaskForm({ open, onClose, task }: TaskFormProps) {
           <CronEditor />
         </Form.Item>
 
-        <Form.Item name="command" label={t('taskForm.command')} rules={[{ required: true, message: t('taskForm.commandRequired') }]}>
-          <Input.TextArea
-            rows={3}
-            placeholder={t('taskForm.commandPlaceholder')}
-            style={{ fontFamily: 'var(--font-mono)', fontSize: 13 }}
-          />
+        <Form.Item
+          label={
+            <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              {t('taskForm.command')}
+              {scripts && scripts.length > 0 && (
+                <Button
+                  type="link"
+                  size="small"
+                  icon={<CodeOutlined />}
+                  onClick={() => setScriptSelectOpen(!scriptSelectOpen)}
+                  style={{ padding: 0, height: 'auto', fontSize: 12 }}
+                >
+                  {t('taskForm.refScript')}
+                </Button>
+              )}
+            </span>
+          }
+        >
+          {scriptSelectOpen && (
+            <Select
+              placeholder={t('taskForm.selectScript')}
+              style={{ marginBottom: 8 }}
+              options={scripts?.map(s => ({ label: `${s.name} (${s.language})`, value: s.name }))}
+              onChange={(val) => {
+                form.setFieldValue('command', `#!script:${val}`);
+                setScriptSelectOpen(false);
+              }}
+            />
+          )}
+          <Form.Item name="command" noStyle rules={[{ required: true, message: t('taskForm.commandRequired') }]}>
+            <Input.TextArea
+              rows={3}
+              placeholder={t('taskForm.commandPlaceholder')}
+              style={{ fontFamily: 'var(--font-mono)', fontSize: 13 }}
+            />
+          </Form.Item>
         </Form.Item>
 
         <Form.Item name="working_dir" label={t('taskForm.workingDir')}>

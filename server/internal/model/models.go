@@ -100,6 +100,16 @@ type ExecutionLog struct {
 	CreatedAt   time.Time   `json:"created_at"`
 }
 
+type Script struct {
+	ID          uint      `json:"id" gorm:"primaryKey"`
+	Name        string    `json:"name" gorm:"size:200;not null;uniqueIndex"`
+	Language    string    `json:"language" gorm:"size:20;not null;default:shell"` // shell/python/node
+	Description string    `json:"description" gorm:"size:500"`
+	Filename    string    `json:"filename" gorm:"size:300;not null"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+}
+
 type AlertType string
 
 const (

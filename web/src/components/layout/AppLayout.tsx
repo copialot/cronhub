@@ -5,6 +5,7 @@ import {
   ScheduleOutlined,
   HistoryOutlined,
   SettingOutlined,
+  CodeOutlined,
   SunOutlined,
   MoonOutlined,
   LogoutOutlined,
@@ -48,6 +49,7 @@ export default function AppLayout() {
   const menuItems = [
     { key: '/', icon: <DashboardOutlined />, label: t('menu.dashboard') },
     { key: '/tasks', icon: <ScheduleOutlined />, label: t('menu.tasks') },
+    { key: '/scripts', icon: <CodeOutlined />, label: t('menu.scripts') },
     { key: '/history', icon: <HistoryOutlined />, label: t('menu.history') },
     { key: '/settings', icon: <SettingOutlined />, label: t('menu.settings') },
   ];

@@ -1,8 +1,8 @@
 import axios from 'axios';
 import type {
-  Task, TaskGroup, ExecutionLog, AlertConfig,
+  Task, TaskGroup, ExecutionLog, AlertConfig, Script,
   StatsOverview, DailyStats, TaskStats,
-  PaginatedResponse, CreateTaskRequest, CreateGroupRequest, CreateAlertRequest,
+  PaginatedResponse, CreateTaskRequest, CreateGroupRequest, CreateAlertRequest, CreateScriptRequest,
 } from '../types';
 
 const api = axios.create({
@@ -94,6 +94,20 @@ export const statsApi = {
 export const versionApi = {
   check: () =>
     api.get<{ current: string; latest: string; has_new: boolean }>('/version').then(r => r.data),
+};
+
+// 脚本
+export const scriptApi = {
+  list: () =>
+    api.get<Script[]>('/scripts').then(r => r.data),
+  get: (id: number) =>
+    api.get<Script>(`/scripts/${id}`).then(r => r.data),
+  create: (data: CreateScriptRequest) =>
+    api.post<Script>('/scripts', data).then(r => r.data),
+  update: (id: number, data: CreateScriptRequest) =>
+    api.put<Script>(`/scripts/${id}`, data).then(r => r.data),
+  delete: (id: number) =>
+    api.delete(`/scripts/${id}`),
 };
 
 // 告警

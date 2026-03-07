@@ -55,9 +55,14 @@ func main() {
 	logRepo := repository.NewExecutionLogRepo(database)
 	alertRepo := repository.NewAlertConfigRepo(database)
 
+	// 初始化 repositories (scripts)
+	scriptRepo := repository.NewScriptRepo(database)
+
 	// 初始化 services
 	alertSvc := service.NewAlertService(alertRepo)
 	executor := service.NewExecutor(taskRepo, logRepo, hub, alertSvc)
+	scriptSvc := service.NewScriptService(scriptRepo, cfg.DataDir)
+	executor.SetScriptService(scriptSvc)
 	scheduler := service.NewScheduler(taskRepo, executor, logRepo, cfg.LogRetentionDays)
 
 	// 配置邮件通知
@@ -83,6 +88,7 @@ func main() {
 	statsHandler := handler.NewStatsHandler(logRepo)
 	alertHandler := handler.NewAlertHandler(alertRepo)
 	wsHandler := handler.NewWSHandler(hub)
+	scriptHandler := handler.NewScriptHandler(scriptSvc)
 
 	// 设置 Gin
 	gin.SetMode(gin.ReleaseMode)
@@ -173,6 +179,13 @@ func main() {
 		api.GET("/stats/overview", statsHandler.Overview)
 		api.GET("/stats/tasks/:id", statsHandler.TaskStats)
 		api.GET("/stats/chart", statsHandler.Chart)
+
+		// 脚本
+		api.GET("/scripts", scriptHandler.List)
+		api.POST("/scripts", scriptHandler.Create)
+		api.GET("/scripts/:id", scriptHandler.Get)
+		api.PUT("/scripts/:id", scriptHandler.Update)
+		api.DELETE("/scripts/:id", scriptHandler.Delete)
 
 		// 告警
 		api.GET("/alerts", alertHandler.List)

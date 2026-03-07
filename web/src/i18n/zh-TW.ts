@@ -5,6 +5,8 @@ const zhTW = {
   'menu.history': '執行歷史',
   'menu.settings': '系統設定',
 
+  'menu.scripts': '腳本庫',
+
   // AppLayout - Header
   'header.theme.light': '亮色模式',
   'header.theme.dark': '暗色模式',
@@ -179,6 +181,26 @@ const zhTW = {
   'taskForm.timeout': '逾時(秒)',
   'taskForm.retryCount': '重試次數',
   'taskForm.enabled': '啟用',
+  'taskForm.refScript': '引用腳本',
+  'taskForm.selectScript': '選擇腳本',
+
+  // ScriptList
+  'scriptList.title': '腳本庫',
+  'scriptList.create': '建立腳本',
+  'scriptList.col.name': '名稱',
+  'scriptList.col.language': '語言',
+  'scriptList.col.description': '描述',
+  'scriptList.col.updatedAt': '更新時間',
+  'scriptList.deleteConfirm': '確定刪除此腳本？',
+
+  // ScriptEdit
+  'scriptEdit.namePlaceholder': '腳本名稱',
+  'scriptEdit.descriptionPlaceholder': '描述（可選）',
+  'scriptEdit.nameRequired': '請輸入腳本名稱',
+  'scriptEdit.create': '建立',
+  'scriptEdit.save': '儲存',
+  'scriptEdit.createSuccess': '腳本建立成功',
+  'scriptEdit.saveSuccess': '腳本儲存成功',
 };
 
 export default zhTW;
