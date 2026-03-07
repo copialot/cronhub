@@ -45,22 +45,22 @@ export default function Dashboard() {
       </Title>
 
       <Row gutter={[16, 16]}>
-        <Col span={6}>
+        <Col xs={12} sm={12} md={6}>
           <StatCard title={t('dashboard.totalTasks')} value={stats?.total_tasks ?? 0} color="var(--accent-primary)" icon={<ScheduleOutlined />} />
         </Col>
-        <Col span={6}>
+        <Col xs={12} sm={12} md={6}>
           <StatCard title={t('dashboard.running')} value={stats?.running_tasks ?? 0} color="var(--accent-info)" icon={<PlayCircleOutlined />} />
         </Col>
-        <Col span={6}>
+        <Col xs={12} sm={12} md={6}>
           <StatCard title={t('dashboard.todaySuccess')} value={stats?.today_success ?? 0} color="var(--accent-success)" icon={<CheckCircleOutlined />} />
         </Col>
-        <Col span={6}>
+        <Col xs={12} sm={12} md={6}>
           <StatCard title={t('dashboard.todayFailed')} value={stats?.today_failed ?? 0} color="var(--accent-danger)" icon={<CloseCircleOutlined />} />
         </Col>
       </Row>
 
       <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
-        <Col span={12}>
+        <Col xs={24} md={12}>
           <Card title={<span style={{ fontFamily: 'var(--font-mono)' }}>{t('dashboard.successRate')}</span>}>
             <ResponsiveContainer width="100%" height={240}>
               <LineChart data={chartData || []}>
@@ -76,7 +76,7 @@ export default function Dashboard() {
             </ResponsiveContainer>
           </Card>
         </Col>
-        <Col span={12}>
+        <Col xs={24} md={12}>
           <Card title={<span style={{ fontFamily: 'var(--font-mono)' }}>{t('dashboard.dailyStats')}</span>}>
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={chartData || []}>

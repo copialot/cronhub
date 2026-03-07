@@ -103,8 +103,12 @@ type ExecutionLog struct {
 type AlertType string
 
 const (
-	AlertTypeEmail   AlertType = "email"
-	AlertTypeWebhook AlertType = "webhook"
+	AlertTypeEmail    AlertType = "email"
+	AlertTypeWebhook  AlertType = "webhook"
+	AlertTypeSlack    AlertType = "slack"
+	AlertTypeDingtalk AlertType = "dingtalk"
+	AlertTypeFeishu   AlertType = "feishu"
+	AlertTypeTelegram AlertType = "telegram"
 )
 
 type AlertConfig struct {

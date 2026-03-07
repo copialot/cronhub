@@ -17,7 +17,11 @@ func NewAlertService(alertRepo *repository.AlertConfigRepo) *AlertService {
 	return &AlertService{
 		alertRepo: alertRepo,
 		notifiers: map[model.AlertType]notifier.Notifier{
-			model.AlertTypeWebhook: &notifier.WebhookNotifier{},
+			model.AlertTypeWebhook:  &notifier.WebhookNotifier{},
+			model.AlertTypeSlack:    &notifier.SlackNotifier{},
+			model.AlertTypeDingtalk: &notifier.DingtalkNotifier{},
+			model.AlertTypeFeishu:   &notifier.FeishuNotifier{},
+			model.AlertTypeTelegram: &notifier.TelegramNotifier{},
 		},
 	}
 }

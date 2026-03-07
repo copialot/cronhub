@@ -88,7 +88,12 @@ func (h *ExecutionHandler) ListAll(c *gin.Context) {
 		}
 	}
 
-	logs, total, err := h.repo.ListAll(status, from, to, limit, offset)
+	var keyword *string
+	if q := c.Query("q"); q != "" {
+		keyword = &q
+	}
+
+	logs, total, err := h.repo.ListAll(status, from, to, keyword, limit, offset)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

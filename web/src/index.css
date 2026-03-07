@@ -153,8 +153,17 @@ html, body, #root {
 }
 
 .log-line.stdout { color: var(--text-primary); }
-.log-line.stderr { color: var(--accent-danger); }
-.log-line.start, .log-line.finish { color: var(--accent-info); }
+.log-line.stderr {
+  color: var(--accent-danger);
+  background: rgba(239, 68, 68, 0.06);
+  border-left: 2px solid var(--accent-danger);
+  padding-left: 8px;
+  margin-left: -8px;
+}
+.log-line.start, .log-line.finish {
+  color: var(--accent-info);
+  font-style: italic;
+}
 .log-line.retry { color: var(--accent-success); }
 
 @keyframes logFadeIn {
@@ -205,4 +214,26 @@ html, body, #root {
 @keyframes pageIn {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .stat-value {
+    font-size: 24px;
+  }
+
+  .ant-table {
+    font-size: 12px;
+  }
+
+  .ant-descriptions-item-label,
+  .ant-descriptions-item-content {
+    font-size: 12px !important;
+  }
+
+  .log-viewer {
+    padding: 10px;
+    font-size: 11px;
+    max-height: 300px;
+  }
 }

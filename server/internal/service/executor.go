@@ -11,6 +11,7 @@ import (
 	"os/exec"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	"cronhub/internal/model"
@@ -128,7 +129,8 @@ func (e *Executor) runCommand(task *model.Task, roomID string) (exitCode int, st
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, "sh", "-c", task.Command)
+	cmd := exec.Command("sh", "-c", task.Command)
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	if task.WorkingDir != "" {
 		cmd.Dir = task.WorkingDir
 	}
@@ -163,6 +165,14 @@ func (e *Executor) runCommand(task *model.Task, roomID string) (exitCode int, st
 		e.broadcastWS(roomID, "stderr", errMsg)
 		return 1, "", errMsg
 	}
+
+	// 超时时 kill 整个进程组，确保子进程不残留
+	go func() {
+		<-ctx.Done()
+		if ctx.Err() == context.DeadlineExceeded && cmd.Process != nil {
+			_ = syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+		}
+	}()
 
 	var stdoutBuf, stderrBuf strings.Builder
 	var wg sync.WaitGroup

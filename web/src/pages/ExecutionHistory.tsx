@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { Card, Table, Select, DatePicker, Space, Typography, Button } from 'antd';
+import { useState, useEffect } from 'react';
+import { Card, Table, Select, DatePicker, Space, Typography, Button, Input } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import StatusBadge from '../components/common/StatusBadge';
 import LogViewer from '../components/execution/LogViewer';
@@ -17,15 +18,26 @@ export default function ExecutionHistory() {
   const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
   const [page, setPage] = useState(1);
   const [selectedExec, setSelectedExec] = useState<ExecutionLog | null>(null);
+  const [keyword, setKeyword] = useState('');
+  const [debouncedKeyword, setDebouncedKeyword] = useState('');
   const pageSize = 20;
   const { t } = useLocale();
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedKeyword(keyword);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [keyword]);
+
   const { data, isLoading } = useQuery({
-    queryKey: ['executions', 'all', status, dateRange?.[0]?.format('YYYY-MM-DD'), dateRange?.[1]?.format('YYYY-MM-DD'), page],
+    queryKey: ['executions', 'all', status, dateRange?.[0]?.format('YYYY-MM-DD'), dateRange?.[1]?.format('YYYY-MM-DD'), debouncedKeyword, page],
     queryFn: () => executionApi.listAll({
       status,
       from: dateRange?.[0]?.format('YYYY-MM-DD'),
       to: dateRange?.[1]?.format('YYYY-MM-DD'),
+      q: debouncedKeyword || undefined,
       limit: pageSize,
       offset: (page - 1) * pageSize,
     }),
@@ -62,7 +74,15 @@ export default function ExecutionHistory() {
       </Title>
 
       <Card>
-        <Space style={{ marginBottom: 16 }}>
+        <Space style={{ marginBottom: 16 }} wrap>
+          <Input
+            prefix={<SearchOutlined style={{ color: 'var(--text-secondary)' }} />}
+            placeholder={t('execHistory.searchPlaceholder')}
+            value={keyword}
+            onChange={e => setKeyword(e.target.value)}
+            allowClear
+            style={{ width: 200 }}
+          />
           <Select
             placeholder={t('execHistory.filterStatus')}
             allowClear

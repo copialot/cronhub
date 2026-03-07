@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Layout, Menu, Button, Tooltip, Dropdown, Badge } from 'antd';
+import { Layout, Menu, Button, Tooltip, Dropdown, Badge, Drawer } from 'antd';
 import {
   DashboardOutlined,
   ScheduleOutlined,
@@ -10,6 +10,7 @@ import {
   LogoutOutlined,
   GlobalOutlined,
   ArrowUpOutlined,
+  MenuOutlined,
 } from '@ant-design/icons';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '../../hooks/useTheme';
@@ -26,10 +27,23 @@ export default function AppLayout() {
   const { mode, toggle } = useTheme();
   const { locale, setLocale, t } = useLocale();
   const [versionInfo, setVersionInfo] = useState<{ current: string; latest: string; has_new: boolean } | null>(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     versionApi.check().then(setVersionInfo).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // 路由变化时关闭 drawer
+  useEffect(() => {
+    setDrawerOpen(false);
+  }, [location.pathname]);
 
   const menuItems = [
     { key: '/', icon: <DashboardOutlined />, label: t('menu.dashboard') },
@@ -56,47 +70,66 @@ export default function AppLayout() {
     label: localeLabels[key],
   }));
 
+  const siderContent = (
+    <>
+      <div style={{
+        padding: '16px 20px',
+        borderBottom: '1px solid var(--border-color)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+      }}>
+        <Logo size={30} />
+        <span style={{
+          fontFamily: 'var(--font-mono)',
+          fontWeight: 600,
+          fontSize: 16,
+          color: 'var(--text-primary)',
+        }}>
+          CronHub
+        </span>
+      </div>
+      <div style={{ flex: 1 }}>
+        <Menu
+          mode="inline"
+          selectedKeys={[selectedKey]}
+          items={menuItems}
+          onClick={({ key }) => navigate(key)}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            marginTop: 8,
+          }}
+        />
+      </div>
+    </>
+  );
+
   return (
     <Layout style={{ height: '100vh' }}>
-      <Sider
-        width={220}
-        style={{
-          borderRight: '1px solid var(--border-color)',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        <div style={{
-          padding: '16px 20px',
-          borderBottom: '1px solid var(--border-color)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-        }}>
-          <Logo size={30} />
-          <span style={{
-            fontFamily: 'var(--font-mono)',
-            fontWeight: 600,
-            fontSize: 16,
-            color: 'var(--text-primary)',
-          }}>
-            CronHub
-          </span>
-        </div>
-        <div style={{ flex: 1 }}>
-          <Menu
-            mode="inline"
-            selectedKeys={[selectedKey]}
-            items={menuItems}
-            onClick={({ key }) => navigate(key)}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              marginTop: 8,
-            }}
-          />
-        </div>
-      </Sider>
+      {isMobile ? (
+        <Drawer
+          placement="left"
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          width={220}
+          styles={{ body: { padding: 0, background: 'var(--bg-secondary)' } }}
+          closable={false}
+        >
+          {siderContent}
+        </Drawer>
+      ) : (
+        <Sider
+          width={220}
+          style={{
+            borderRight: '1px solid var(--border-color)',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          {siderContent}
+        </Sider>
+      )}
       <Layout>
         <Header style={{
           height: 48,
@@ -108,13 +141,24 @@ export default function AppLayout() {
           alignItems: 'center',
           justifyContent: 'space-between',
         }}>
-          <span style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: 13,
-            color: 'var(--text-secondary)',
-          }}>
-            {currentPage?.label || 'Dashboard'}
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {isMobile && (
+              <Button
+                type="text"
+                size="small"
+                icon={<MenuOutlined />}
+                onClick={() => setDrawerOpen(true)}
+                style={{ color: 'var(--text-secondary)' }}
+              />
+            )}
+            <span style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: 13,
+              color: 'var(--text-secondary)',
+            }}>
+              {currentPage?.label || 'Dashboard'}
+            </span>
+          </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             {versionInfo && (
               <Tooltip title={versionInfo.has_new
@@ -179,7 +223,7 @@ export default function AppLayout() {
             )}
           </div>
         </Header>
-        <Content style={{ overflow: 'auto', padding: 24 }}>
+        <Content style={{ overflow: 'auto', padding: isMobile ? 12 : 24 }}>
           <div className="page-enter">
             <Outlet />
           </div>

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/smtp"
+	"strings"
 	"time"
 )
 
@@ -75,6 +76,116 @@ func (e *EmailNotifier) Send(msg Message) error {
 	auth := smtp.PlainAuth("", e.User, e.Pass, e.Host)
 	addr := fmt.Sprintf("%s:%d", e.Host, e.Port)
 	return smtp.SendMail(addr, auth, e.From, []string{msg.Endpoint}, []byte(message))
+}
+
+// SlackNotifier 通过 Slack Webhook 发送告警
+type SlackNotifier struct{}
+
+func (s *SlackNotifier) Send(msg Message) error {
+	text := fmt.Sprintf("CronHub 告警\n任务: %s\n状态: %s\n耗时: %dms\n输出: %s\n错误: %s",
+		msg.TaskName, msg.Status, msg.Duration,
+		truncateStr(msg.Output, 500), truncateStr(msg.Error, 500))
+	payload := map[string]string{"text": text}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+	resp, err := http.Post(msg.Endpoint, "application/json", bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("slack webhook 返回状态码: %d", resp.StatusCode)
+	}
+	return nil
+}
+
+// DingtalkNotifier 通过钉钉 Webhook 发送告警
+type DingtalkNotifier struct{}
+
+func (d *DingtalkNotifier) Send(msg Message) error {
+	text := fmt.Sprintf("CronHub 告警\n任务: %s\n状态: %s\n耗时: %dms\n输出: %s\n错误: %s",
+		msg.TaskName, msg.Status, msg.Duration,
+		truncateStr(msg.Output, 500), truncateStr(msg.Error, 500))
+	payload := map[string]interface{}{
+		"msgtype": "text",
+		"text":    map[string]string{"content": text},
+	}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+	resp, err := http.Post(msg.Endpoint, "application/json", bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("dingtalk webhook 返回状态码: %d", resp.StatusCode)
+	}
+	return nil
+}
+
+// FeishuNotifier 通过飞书 Webhook 发送告警
+type FeishuNotifier struct{}
+
+func (f *FeishuNotifier) Send(msg Message) error {
+	text := fmt.Sprintf("CronHub 告警\n任务: %s\n状态: %s\n耗时: %dms\n输出: %s\n错误: %s",
+		msg.TaskName, msg.Status, msg.Duration,
+		truncateStr(msg.Output, 500), truncateStr(msg.Error, 500))
+	payload := map[string]interface{}{
+		"msg_type": "text",
+		"content":  map[string]string{"text": text},
+	}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+	resp, err := http.Post(msg.Endpoint, "application/json", bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("feishu webhook 返回状态码: %d", resp.StatusCode)
+	}
+	return nil
+}
+
+// TelegramNotifier 通过 Telegram Bot API 发送告警
+// endpoint 格式: bot_token:chat_id
+type TelegramNotifier struct{}
+
+func (t *TelegramNotifier) Send(msg Message) error {
+	parts := strings.SplitN(msg.Endpoint, ":", 2)
+	if len(parts) != 2 {
+		return fmt.Errorf("telegram endpoint 格式错误，应为 bot_token:chat_id")
+	}
+	botToken, chatID := parts[0], parts[1]
+
+	text := fmt.Sprintf("🔔 CronHub 告警\n任务: %s\n状态: %s\n耗时: %dms\n输出: %s\n错误: %s",
+		msg.TaskName, msg.Status, msg.Duration,
+		truncateStr(msg.Output, 500), truncateStr(msg.Error, 500))
+
+	url := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", botToken)
+	payload := map[string]string{
+		"chat_id": chatID,
+		"text":    text,
+	}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+	resp, err := http.Post(url, "application/json", bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("telegram API 返回状态码: %d", resp.StatusCode)
+	}
+	return nil
 }
 
 func truncateStr(s string, maxLen int) string {

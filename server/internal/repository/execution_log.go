@@ -45,23 +45,35 @@ func (r *ExecutionLogRepo) ListRecent(limit int) ([]model.ExecutionLog, error) {
 	return logs, err
 }
 
-func (r *ExecutionLogRepo) ListAll(status *string, from, to *time.Time, limit, offset int) ([]model.ExecutionLog, int64, error) {
+func (r *ExecutionLogRepo) ListAll(status *string, from, to *time.Time, keyword *string, limit, offset int) ([]model.ExecutionLog, int64, error) {
 	var logs []model.ExecutionLog
 	var total int64
 
 	q := r.db.Model(&model.ExecutionLog{})
 	if status != nil {
-		q = q.Where("status = ?", *status)
+		q = q.Where("execution_logs.status = ?", *status)
 	}
 	if from != nil {
-		q = q.Where("started_at >= ?", *from)
+		q = q.Where("execution_logs.started_at >= ?", *from)
 	}
 	if to != nil {
-		q = q.Where("started_at <= ?", *to)
+		q = q.Where("execution_logs.started_at <= ?", *to)
+	}
+	if keyword != nil && *keyword != "" {
+		like := "%" + *keyword + "%"
+		q = q.Joins("LEFT JOIN tasks ON tasks.id = execution_logs.task_id").
+			Where("execution_logs.output LIKE ? OR execution_logs.error_output LIKE ? OR tasks.name LIKE ?", like, like, like)
 	}
 	q.Count(&total)
-	err := q.Preload("Task").Order("id DESC").Limit(limit).Offset(offset).Find(&logs).Error
+	err := q.Preload("Task").Order("execution_logs.id DESC").Limit(limit).Offset(offset).Find(&logs).Error
 	return logs, total, err
+}
+
+// DeleteBefore 删除指定时间之前已完成的执行日志
+func (r *ExecutionLogRepo) DeleteBefore(before time.Time) (int64, error) {
+	result := r.db.Where("finished_at < ? AND status != ?", before, model.ExecStatusRunning).
+		Delete(&model.ExecutionLog{})
+	return result.RowsAffected, result.Error
 }
 
 // 统计相关查询

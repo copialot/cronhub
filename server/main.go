@@ -58,7 +58,7 @@ func main() {
 	// 初始化 services
 	alertSvc := service.NewAlertService(alertRepo)
 	executor := service.NewExecutor(taskRepo, logRepo, hub, alertSvc)
-	scheduler := service.NewScheduler(taskRepo, executor)
+	scheduler := service.NewScheduler(taskRepo, executor, logRepo, cfg.LogRetentionDays)
 
 	// 配置邮件通知
 	if cfg.SMTPHost != "" {

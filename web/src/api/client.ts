@@ -76,7 +76,7 @@ export const executionApi = {
     api.get<ExecutionLog>(`/executions/${id}`).then(r => r.data),
   recent: (limit?: number) =>
     api.get<ExecutionLog[]>('/executions/recent', { params: { limit } }).then(r => r.data),
-  listAll: (params?: { status?: string; from?: string; to?: string; limit?: number; offset?: number }) =>
+  listAll: (params?: { status?: string; from?: string; to?: string; q?: string; limit?: number; offset?: number }) =>
     api.get<PaginatedResponse<ExecutionLog>>('/executions', { params }).then(r => r.data),
 };
 

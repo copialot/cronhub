@@ -106,6 +106,15 @@ const en = {
   'settings.msg.deleted': 'Deleted',
   'settings.msg.testSuccess': 'Test sent successfully',
   'settings.msg.testFailed': 'Test send failed',
+  'settings.dingtalk': 'DingTalk',
+  'settings.feishu': 'Feishu',
+  'settings.endpointHint.webhook': 'https://hooks.example.com/xxx',
+  'settings.endpointHint.email': 'admin@example.com',
+  'settings.endpointHint.slack': 'https://hooks.slack.com/services/xxx',
+  'settings.endpointHint.dingtalk': 'https://oapi.dingtalk.com/robot/send?access_token=xxx',
+  'settings.endpointHint.feishu': 'https://open.feishu.cn/open-apis/bot/v2/hook/xxx',
+  'settings.endpointHint.telegram': 'bot_token:chat_id',
+  'execHistory.searchPlaceholder': 'Search keyword...',
 
   // Version
   'version.newAvailable': 'New version available: {version}',

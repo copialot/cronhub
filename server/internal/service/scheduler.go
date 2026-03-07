@@ -3,6 +3,7 @@ package service
 import (
 	"log"
 	"sync"
+	"time"
 
 	"cronhub/internal/model"
 	"cronhub/internal/repository"
@@ -12,22 +13,26 @@ import (
 )
 
 type Scheduler struct {
-	mu       sync.RWMutex
-	cron     *cron.Cron
-	entries  map[uint]cron.EntryID // taskID -> cronEntryID
-	taskRepo *repository.TaskRepo
-	executor *Executor
+	mu               sync.RWMutex
+	cron             *cron.Cron
+	entries          map[uint]cron.EntryID // taskID -> cronEntryID
+	taskRepo         *repository.TaskRepo
+	executor         *Executor
+	logRepo          *repository.ExecutionLogRepo
+	logRetentionDays int
 }
 
-func NewScheduler(taskRepo *repository.TaskRepo, executor *Executor) *Scheduler {
+func NewScheduler(taskRepo *repository.TaskRepo, executor *Executor, logRepo *repository.ExecutionLogRepo, retentionDays int) *Scheduler {
 	parser := cronutil.GetParser()
 	c := cron.New(cron.WithParser(parser), cron.WithChain(cron.Recover(cron.DefaultLogger)))
 
 	return &Scheduler{
-		cron:     c,
-		entries:  make(map[uint]cron.EntryID),
-		taskRepo: taskRepo,
-		executor: executor,
+		cron:             c,
+		entries:          make(map[uint]cron.EntryID),
+		taskRepo:         taskRepo,
+		executor:         executor,
+		logRepo:          logRepo,
+		logRetentionDays: retentionDays,
 	}
 }
 
@@ -42,6 +47,19 @@ func (s *Scheduler) Start() error {
 		if err := s.addTask(&tasks[i]); err != nil {
 			log.Printf("加载任务 [%d] %s 失败: %v", tasks[i].ID, tasks[i].Name, err)
 		}
+	}
+
+	// 注册日志清理任务：每天凌晨 2:00
+	if s.logRepo != nil && s.logRetentionDays > 0 {
+		s.cron.AddFunc("0 2 * * *", func() {
+			before := time.Now().AddDate(0, 0, -s.logRetentionDays)
+			deleted, err := s.logRepo.DeleteBefore(before)
+			if err != nil {
+				log.Printf("清理执行日志失败: %v", err)
+			} else if deleted > 0 {
+				log.Printf("已清理 %d 条过期执行日志（保留 %d 天）", deleted, s.logRetentionDays)
+			}
+		})
 	}
 
 	s.cron.Start()

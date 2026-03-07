@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import StatusBadge from '../components/common/StatusBadge';
 import TaskForm from '../components/task/TaskForm';
 import { useTasks, useDeleteTask, useToggleTask, useRunTask, useGroups, useCreateGroup, useDeleteGroup } from '../hooks/useTasks';
-import { formatTime, timeAgo } from '../lib/utils';
+import { formatTime, timeAgo, describeCron } from '../lib/utils';
 import { useLocale } from '../hooks/useLocale';
 import type { Task } from '../types';
 
@@ -74,7 +74,10 @@ export default function TaskList() {
       dataIndex: 'cron_expr',
       key: 'cron',
       render: (v: string) => (
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--accent-info)' }}>{v}</span>
+        <span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--accent-info)' }}>{v}</span>
+          <span style={{ marginLeft: 6, color: 'var(--text-secondary)', fontSize: 11 }}>{describeCron(v)}</span>
+        </span>
       ),
     },
     { title: t('col.status'), dataIndex: 'status', key: 'status', render: (s: string) => <StatusBadge status={s} /> },

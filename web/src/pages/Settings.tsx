@@ -137,10 +137,29 @@ export default function Settings() {
             <Select options={[
               { label: 'Webhook', value: 'webhook' },
               { label: 'Email', value: 'email' },
+              { label: 'Slack', value: 'slack' },
+              { label: t('settings.dingtalk'), value: 'dingtalk' },
+              { label: t('settings.feishu'), value: 'feishu' },
+              { label: 'Telegram', value: 'telegram' },
             ]} />
           </Form.Item>
-          <Form.Item name="endpoint" label={t('settings.endpointLabel')} rules={[{ required: true }]}>
-            <Input placeholder={t('settings.endpointPlaceholder')} />
+          <Form.Item noStyle shouldUpdate={(prev, cur) => prev.type !== cur.type}>
+            {() => {
+              const type = form.getFieldValue('type');
+              const hints: Record<string, string> = {
+                webhook: t('settings.endpointHint.webhook'),
+                email: t('settings.endpointHint.email'),
+                slack: t('settings.endpointHint.slack'),
+                dingtalk: t('settings.endpointHint.dingtalk'),
+                feishu: t('settings.endpointHint.feishu'),
+                telegram: t('settings.endpointHint.telegram'),
+              };
+              return (
+                <Form.Item name="endpoint" label={t('settings.endpointLabel')} rules={[{ required: true }]}>
+                  <Input placeholder={hints[type] || t('settings.endpointPlaceholder')} />
+                </Form.Item>
+              );
+            }}
           </Form.Item>
           <Space size="large">
             <Form.Item name="on_failure" label={t('settings.onFailureLabel')} valuePropName="checked"><Switch /></Form.Item>

@@ -51,7 +51,7 @@ export interface AlertConfig {
   id: number;
   task_id: number | null;
   task?: Task;
-  type: 'email' | 'webhook';
+  type: 'email' | 'webhook' | 'slack' | 'dingtalk' | 'feishu' | 'telegram';
   endpoint: string;
   on_failure: boolean;
   on_timeout: boolean;
@@ -114,7 +114,7 @@ export interface CreateGroupRequest {
 
 export interface CreateAlertRequest {
   task_id?: number | null;
-  type: 'email' | 'webhook';
+  type: 'email' | 'webhook' | 'slack' | 'dingtalk' | 'feishu' | 'telegram';
   endpoint: string;
   on_failure?: boolean;
   on_timeout?: boolean;

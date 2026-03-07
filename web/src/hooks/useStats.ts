@@ -21,6 +21,7 @@ export function useChartData(range: string = '7d') {
   return useQuery({
     queryKey: ['stats', 'chart', range],
     queryFn: () => statsApi.chart(range),
+    refetchInterval: 30000,
   });
 }
 

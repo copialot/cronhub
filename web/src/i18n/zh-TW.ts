@@ -106,6 +106,15 @@ const zhTW = {
   'settings.msg.deleted': '已刪除',
   'settings.msg.testSuccess': '測試發送成功',
   'settings.msg.testFailed': '測試發送失敗',
+  'settings.dingtalk': '釘釘',
+  'settings.feishu': '飛書',
+  'settings.endpointHint.webhook': 'https://hooks.example.com/xxx',
+  'settings.endpointHint.email': 'admin@example.com',
+  'settings.endpointHint.slack': 'https://hooks.slack.com/services/xxx',
+  'settings.endpointHint.dingtalk': 'https://oapi.dingtalk.com/robot/send?access_token=xxx',
+  'settings.endpointHint.feishu': 'https://open.feishu.cn/open-apis/bot/v2/hook/xxx',
+  'settings.endpointHint.telegram': 'bot_token:chat_id',
+  'execHistory.searchPlaceholder': '搜尋關鍵詞...',
 
   // Version
   'version.newAvailable': '發現新版本: {version}',

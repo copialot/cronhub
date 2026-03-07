@@ -7,7 +7,7 @@ import LogViewer from '../components/execution/LogViewer';
 import TaskForm from '../components/task/TaskForm';
 import { useTask, useRunTask } from '../hooks/useTasks';
 import { useTaskExecutions, useTaskStats } from '../hooks/useStats';
-import { formatTime, formatDuration, triggerText } from '../lib/utils';
+import { formatTime, formatDuration, triggerText, describeCron } from '../lib/utils';
 import { useLocale } from '../hooks/useLocale';
 import type { ExecutionLog } from '../types';
 
@@ -69,6 +69,7 @@ export default function TaskDetail() {
             <Descriptions column={2} size="small">
               <Descriptions.Item label={t('taskDetail.cronExpr')}>
                 <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--accent-info)' }}>{task.cron_expr}</span>
+                <span style={{ marginLeft: 8, color: 'var(--text-secondary)', fontSize: 12 }}>{describeCron(task.cron_expr)}</span>
               </Descriptions.Item>
               <Descriptions.Item label={t('taskDetail.workingDir')}>{task.working_dir || '-'}</Descriptions.Item>
               <Descriptions.Item label={t('taskDetail.timeout')}>{task.timeout}{t('taskDetail.seconds')}</Descriptions.Item>
